@@ -1,14 +1,22 @@
-import datetime
-
 import discord
 from discord import app_commands
 from dotenv import load_dotenv
 import os
+import datetime
+import utils
+
 
 ### CONFIG
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
+LOG_CHANNEL_ID = int(os.getenv('LOG_CHANNEL_ID'))
 
+# grauer raum
+modules = utils.get_modules()
+GR_DEL_MIN = int(os.getenv('GR_DEL_MIN'))
+GR_DEL_SEC = GR_DEL_MIN * 60
+
+# client
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
@@ -59,5 +67,34 @@ async def on_message_delete(message):
         text=f'Author ID: {author.id} | Message ID: {message.id} | {time_del.strftime('%d.%m.%Y %H:%M')}')
     await log_channel.send(embed=msg_del)
 
+
+### grauer raum
+@tree.command(name='gr', description='Schickt Altklausuren vom ausgewählten Modul')
+@app_commands.describe(modul='Abkürzung des Moduls')
+async def gr(interaction, modul: modules):
+    path = utils.get_path(modul)
+    try:
+        sent = discord.Embed()
+        sent.colour = discord.Colour.green()
+        sent.title = f'Altklausren {modul}'
+        sent.description = f'Bitte beachte, dass die Nachricht in {GR_DEL_MIN} Minuten gelöscht wird'
+        await interaction.response.send_message(embed=sent, file=discord.File(fp=path), ephemeral=True, delete_after=GR_DEL_SEC)
+    except FileNotFoundError as e:
+        no_file = discord.Embed()
+        no_file.colour = discord.Colour.red()
+        no_file.title = 'Keine Altklausuren zu dem Modul gefunden'
+        no_file.description = f'Das ist nicht dein Fehler. Das Team wurde bereits benachrichtigt.'
+        await interaction.response.send_message(embed=no_file, ephemeral=True, delete_after=GR_DEL_SEC)
+        no_file_log = discord.Embed()
+        no_file_log.colour = discord.Colour.red()
+        no_file_log.title = f'Keine Altklausuren zu dem Modul {modul} gefunden'
+        no_file_log.description = f'Unter dem Pfad `{path}` wurde keine Datei gefunden.'
+        await client.get_channel(LOG_CHANNEL_ID).send(embed=no_file_log)
+
+        MOD_IDS = os.getenv('MOD_IDS')
+        for mod_id in MOD_IDS:
+            mod = client.get_user(int(mod_id))
+            await mod.create_dm()
+            await mod.dm_channel.send(embed=no_file_log)
 
 client.run(TOKEN)
