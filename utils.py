@@ -11,7 +11,7 @@ def connect_db():
     cursor = db.cursor()
     cursor.execute('CREATE TABLE IF NOT EXISTS altklausuren('
                    'modul TEXT PRIMARY KEY,'
-                   'modul_lower TEXT'
+                   'modul_lower TEXT,'
                    'studiengang TEXT,'
                    'beschreibung TEXT'
                    'filepath TEXT'
