@@ -1,3 +1,5 @@
+import sqlite3
+
 import discord
 from discord import app_commands
 from dotenv import load_dotenv
@@ -12,7 +14,6 @@ TOKEN = os.getenv('TOKEN')
 LOG_CHANNEL_ID = int(os.getenv('LOG_CHANNEL_ID'))
 
 # grauer raum
-modules = utils.get_modules()
 GR_DEL_MIN = int(os.getenv('GR_DEL_MIN'))
 GR_DEL_SEC = GR_DEL_MIN * 60
 
@@ -20,6 +21,10 @@ GR_DEL_SEC = GR_DEL_MIN * 60
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
+
+### INIT DB
+data = sqlite3.connect('data.db')
+cursor = data.cursor()
 
 
 ### BOT EVENTS
@@ -71,8 +76,13 @@ async def on_message_delete(message):
 ### grauer raum
 @tree.command(name='gr', description='Schickt Altklausuren vom ausgewählten Modul')
 @app_commands.describe(modul='Abkürzung des Moduls')
-async def gr(interaction, modul: modules):
-    path = utils.get_path(modul)
+async def gr(interaction, modul: str):
+    cursor = utils.connect_db()
+    modules = utils.get_modules(cursor)
+
+    if modul.lower() in modules:
+        #TODO need to get module string in matching case to db string
+        path = utils.get_path(cursor, modul)
     try:
         sent = discord.Embed()
         sent.colour = discord.Colour.green()
