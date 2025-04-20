@@ -11,6 +11,7 @@ def connect_db():
     cursor = db.cursor()
     cursor.execute('CREATE TABLE IF NOT EXISTS altklausuren('
                    'modul TEXT PRIMARY KEY,'
+                   'modul_lower TEXT'
                    'studiengang TEXT,'
                    'beschreibung TEXT'
                    'filepath TEXT'
@@ -20,15 +21,27 @@ def connect_db():
 
 def get_modules(cursor):
     modules_tuples = cursor.execute('SELECT modul FROM altklausren ORDER BY modul;').fetchall()
+    return tuple_list_to_list(modules_tuples)
+
+
+def get_modules_lower(cursor):
+    modules_tuples = cursor.execute('SELECT modul_lower FROM altklausren ORDER BY modul_lower;').fetchall()
     modules = tuple_list_to_list(modules_tuples)
     return [modul.lower() for modul in modules]
 
+
 def get_path(cursor, modul):
-    path_tuple = cursor.execute(f'SELECT filepath FROM altklausren where modul = {modul};').fetchone()
+    path_tuple = cursor.execute(f'SELECT filepath FROM altklausren where modul_lower = {modul};').fetchone()
     return tuple_to_str(path_tuple)
+
+def get_modul_name(cursor, modul):
+    modul_name = cursor.execute(f'SELECT modul FROM altklausren where modul_lower = {modul};').fetchone()
+    return tuple_to_str(modul_name)
+
 
 def tuple_list_to_list(tuple_list):
     return ['%s' % t for t in tuple_list]
+
 
 def tuple_to_str(tuple):
     return ''.join(tuple)

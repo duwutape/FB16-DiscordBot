@@ -7,7 +7,6 @@ import os
 import datetime
 import utils
 
-
 ### CONFIG
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
@@ -45,6 +44,7 @@ async def on_message_edit(before, after):
     author = before.author
     channel = before.channel
     time_edit = after.edited_at.astimezone()
+    #TODO check if bot changed message in gr -> don't log
 
     msg_edit = discord.Embed()
     msg_edit.colour = discord.Colour.yellow()
@@ -63,6 +63,7 @@ async def on_message_delete(message):
     author = message.author
     channel = message.channel
     time_del = datetime.datetime.now().astimezone()
+    #TODO check if bot deleted message in gr -> don't log
 
     msg_del = discord.Embed()
     msg_del.colour = discord.Colour.red()
@@ -78,17 +79,17 @@ async def on_message_delete(message):
 @app_commands.describe(modul='Abkürzung des Moduls')
 async def gr(interaction, modul: str):
     cursor = utils.connect_db()
-    modules = utils.get_modules(cursor)
+    modules_lower = utils.get_modules_lower(cursor)
 
-    if modul.lower() in modules:
-        #TODO need to get module string in matching case to db string
-        path = utils.get_path(cursor, modul)
+    if modul.lower() in modules_lower:
+        path = utils.get_path(cursor, modul.lower())
     try:
         sent = discord.Embed()
         sent.colour = discord.Colour.green()
-        sent.title = f'Altklausren {modul}'
+        sent.title = f'Altklausren {utils.get_modul_name(cursor, modul.lower())}'
         sent.description = f'Bitte beachte, dass die Nachricht in {GR_DEL_MIN} Minuten gelöscht wird'
-        await interaction.response.send_message(embed=sent, file=discord.File(fp=path), ephemeral=True, delete_after=GR_DEL_SEC)
+        await interaction.response.send_message(embed=sent, file=discord.File(fp=path), ephemeral=True,
+                                                delete_after=GR_DEL_SEC)
     except FileNotFoundError as e:
         no_file = discord.Embed()
         no_file.colour = discord.Colour.red()
@@ -106,5 +107,14 @@ async def gr(interaction, modul: str):
             mod = client.get_user(int(mod_id))
             await mod.create_dm()
             await mod.dm_channel.send(embed=no_file_log)
+    else:
+        no_modul = discord.Embed()
+        no_modul.colour = discord.Colour.red()
+        no_modul.title = 'Keine Altklausur gefunden'
+        no_modul.description = (f'Es wurde keine Altklausur für das angegebene Modul geunden.'
+                                f'Eine Liste aller verfügbaren Module findest du in <#{int(os.getenv('GR_ANLEITUNG_CHANNEL_ID'))}>'
+                                f'Bitte überprüfe auch, ob du den Modulnamen richtig gescrieben hast.')
+        await interaction.response.send_message(embed=no_modul, ephemeral=True, delete_after=GR_DEL_SEC)
+
 
 client.run(TOKEN)
