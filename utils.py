@@ -56,8 +56,10 @@ def tuple_to_str(tuple):
 
 def get_mod_ids():
     mod_str = os.getenv('MOD_IDS')
-    return mod_str.split(',')
-
+    if len(mod_str) >= 1:
+        return mod_str.split(',')
+    else:
+        return None
 
 def create_available_modules(study):
     if study == 'inf':

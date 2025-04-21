@@ -1,4 +1,5 @@
 import sqlite3
+import time
 
 import discord
 from discord import app_commands
@@ -101,10 +102,11 @@ async def gr(interaction, modul: str):
             await client.get_channel(LOG_CHANNEL_ID).send(embed=no_file_log)
 
             MOD_IDS = utils.get_mod_ids()
-            for mod_id in MOD_IDS:
-                mod = client.get_user(int(mod_id))
-                await mod.create_dm()
-                await mod.dm_channel.send(embed=no_file_log)
+            if MOD_IDS is not None:
+                for mod_id in MOD_IDS:
+                    mod = client.get_user(int(mod_id))
+                    await mod.create_dm()
+                    await mod.dm_channel.send(embed=no_file_log)
     else:
         no_modul = discord.Embed()
         no_modul.colour = discord.Colour.red()
