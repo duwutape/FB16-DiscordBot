@@ -89,11 +89,11 @@ async def gr(interaction, modul: str):
     if modul.lower() in modules_lower:
         path = utils.get_path(cursor, modul.lower())
         try:
-           sent = discord.Embed()
-           sent.colour = discord.Colour.green()
-           sent.title = f'Altklausren {utils.get_modul_name(cursor, modul.lower())}'
-           sent.description = f'Bitte beachte, dass die Nachricht in {GR_DEL_MIN} Minuten gelöscht wird'
-           await interaction.response.send_message(embed=sent, file=discord.File(fp=path), ephemeral=True,
+            sent = discord.Embed()
+            sent.colour = discord.Colour.green()
+            sent.title = f'Altklausren {utils.get_modul_name(cursor, modul.lower())}'
+            sent.description = f'Bitte beachte, dass die Nachricht in {GR_DEL_MIN} Minuten gelöscht wird'
+            await interaction.response.send_message(embed=sent, file=discord.File(fp=path), ephemeral=True,
                                                     delete_after=GR_DEL_SEC)
         except FileNotFoundError as e:
             no_file = discord.Embed()
