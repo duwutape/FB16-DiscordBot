@@ -117,7 +117,7 @@ async def gr(interaction, modul: str):
         no_modul.colour = discord.Colour.red()
         no_modul.title = 'Keine Altklausur gefunden'
         no_modul.description = (f'Es wurde keine Altklausur für das angegebene Modul geunden.\n'
-                                f'Eine Liste aller verfügbaren Module findest du in <#{int(os.getenv('GR_ANLEITUNG_CHANNEL_ID'))}>.\n'
+                                f'Eine Liste aller verfügbaren Module findest du in <#{os.getenv('GR_ANLEITUNG_CHANNEL_ID')}>.\n'
                                 f'Bitte überprüfe auch, ob du den Modulnamen richtig gescrieben hast.')
         await interaction.response.send_message(embed=no_modul, ephemeral=True, delete_after=GR_DEL_SEC)
 
