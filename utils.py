@@ -1,5 +1,7 @@
 import os
 import sqlite3
+
+import discord
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,6 +24,7 @@ def connect_db():
 def close_db(cursor):
     cursor.connection.close()
 
+
 def get_modules(cursor):
     modules_tuples = cursor.execute('SELECT modul FROM altklausuren ORDER BY modul;').fetchall()
     return tuple_list_to_list(modules_tuples)
@@ -37,6 +40,7 @@ def get_path(cursor, modul):
     path_tuple = cursor.execute(f"SELECT filepath FROM altklausuren WHERE modul_lower = '{modul}';").fetchone()
     return tuple_to_str(path_tuple)
 
+
 def get_modul_name(cursor, modul):
     modul_name = cursor.execute(f"SELECT modul FROM altklausuren WHERE modul_lower = '{modul}';").fetchone()
     return tuple_to_str(modul_name)
@@ -48,6 +52,7 @@ def tuple_list_to_list(tuple_list):
 
 def tuple_to_str(tuple):
     return ''.join(tuple)
+
 
 def get_mod_ids():
     mod_str = os.getenv('MOD_IDS')

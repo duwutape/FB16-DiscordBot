@@ -13,19 +13,12 @@ TOKEN = os.getenv('TOKEN')
 LOG_CHANNEL_ID = int(os.getenv('LOG_CHANNEL_ID'))
 
 # grauer raum
-GR_DEL_MIN = int(os.getenv('GR_DEL_MIN'))
-GR_DEL_SEC = GR_DEL_MIN * 60
+GR_DEL_SEC = int(os.getenv('GR_DEL_MIN')) * 60
 
 # client
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
-
-
-### INIT DB
-# data = sqlite3.connect('data.db')
-# cursor = data.cursor()
-
 
 ### BOT EVENTS
 @client.event
@@ -92,7 +85,7 @@ async def gr(interaction, modul: str):
             sent = discord.Embed()
             sent.colour = discord.Colour.green()
             sent.title = f'Altklausren {utils.get_modul_name(cursor, modul.lower())}'
-            sent.description = f'Bitte beachte, dass die Nachricht in {GR_DEL_MIN} Minuten gelöscht wird'
+            sent.description = f'Bitte beachte, dass die Nachricht in {os.getenv('GR_DEL_MIN')} Minuten gelöscht wird'
             await interaction.response.send_message(embed=sent, file=discord.File(fp=path), ephemeral=True,
                                                     delete_after=GR_DEL_SEC)
         except FileNotFoundError as e:
