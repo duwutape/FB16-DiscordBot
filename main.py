@@ -15,6 +15,7 @@ intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
+
 ### BOT EVENTS
 @client.event
 async def on_ready():
@@ -159,10 +160,12 @@ async def module(interaction):
 
 ### LaTeX
 @tree.command(name='latex', description='Gibt den angegeben Ausdruck als LaTeX-Ausdruck wieder')
-#@app_commands.describe(ausdruck='Ausdruck, der in LaTeX angezeige werden soll')
-async def latex(interaction, ausdruck:str):
-    print('ausdruck')
-    interaction.response.send_message('platzhalter')
+@app_commands.describe(ausdruck='Ausdruck, der in LaTeX angezeige werden soll')
+async def latex(interaction, ausdruck: str):
+    result = utils.request_image(ausdruck)
+    await interaction.response.send_message(file=discord.File(fp=result))
+
+    utils.delete_file(result)
 
 
 client.run(os.getenv('TOKEN'))

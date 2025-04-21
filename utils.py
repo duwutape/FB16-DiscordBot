@@ -1,8 +1,11 @@
 import os
+import shutil
 import sqlite3
-
+import requests
 import discord
 from dotenv import load_dotenv
+
+import constants
 
 load_dotenv()
 
@@ -61,6 +64,7 @@ def get_mod_ids():
     else:
         return None
 
+
 def create_available_modules(study):
     if study == 'inf':
         study_long = 'Informatik'
@@ -75,8 +79,8 @@ def create_available_modules(study):
 
     embed = discord.Embed()
     embed.title = f'Altklausuren {study_long}'
-    embed.add_field(name='Kürzel', value=create_embed_value(modules,0))
-    embed.add_field(name='Modul', value=create_embed_value(modules,1))
+    embed.add_field(name='Kürzel', value=create_embed_value(modules, 0))
+    embed.add_field(name='Modul', value=create_embed_value(modules, 1))
 
     return embed
 
@@ -88,3 +92,45 @@ def create_embed_value(moduels, index: int):
         out = out + f'{modul}\n'
 
     return out
+
+
+# latex
+def create_latex_code(ausdruck):
+    return (r'\documentclass{article}'
+            r'\usepackage{pagecolor}'
+            r'\pagenumbering{gobble}'
+            r'\begin{document}\pagecolor{white} $') + ausdruck + r'$ \end{document}'
+
+
+def get_image_url(filename):
+    return f'{constants.LATEX_SERVER_URL}/{filename}'
+
+
+def get_image_path(filename):
+    return f'{os.getenv('TEMP_FILE_PATH')}{filename}'
+
+
+def request_image(ausdruck):
+    payload = {
+        'format': 'png',
+        'code': create_latex_code(ausdruck),
+        'density': 220,
+        'quality': 100
+    }
+    req = requests.post(url=constants.LATEX_SERVER_URL, json=payload)
+    if req.ok:
+        jreq = req.json()
+        if jreq['status'] == 'error':
+            return
+        filename = req.json()['filename']
+
+        req_img = requests.get(url=get_image_url(filename), stream=True)
+        if req_img.ok:
+            with open(get_image_path(filename), 'wb') as out_file:
+                shutil.copyfileobj(req_img.raw, out_file)
+
+            return get_image_path(filename)
+
+
+def delete_file(path):
+    os.remove(path)
