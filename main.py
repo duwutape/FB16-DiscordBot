@@ -121,7 +121,37 @@ async def gr(interaction, modul: str):
                                 f'Bitte überprüfe auch, ob du den Modulnamen richtig gescrieben hast.')
         await interaction.response.send_message(embed=no_modul, ephemeral=True, delete_after=GR_DEL_SEC)
 
-    cursor.connection.close()
+    utils.close_db(cursor)
+
+
+@tree.command(name='anleitung', description='Schickt die Anleitung für den Grauen Raum in den Anleitungschannel')
+async def anleitung(interaction):
+    anleitung_channel = client.get_channel(int(os.getenv('GR_ANLEITUNG_CHANNEL_ID')))
+    await anleitung_channel.send('# Wichtige Infos zum Grauen Raum\n'
+                                 '## Wie benutze ich den Bot?\n'
+                                 'Mit dem Befehl `/gr [modul]` bekommst du die zu dem Modul vorhanden Alklausuren.\n'
+                                 f'Die Anfrage muss in <#{os.getenv('GR_ANFRAGEN_CHANNEL_ID')}> gestellt werden.\n'
+                                 'Die Kürzel der Module sind dabei nicht case-sensitive. Alle verfügbaren Module findes du weiter unten im Channel.\n'
+                                 '\n'
+                                 '## Achtung:\n'
+                                 f'Die Dateien sind nur für die Person sichtbar, die sie angefragt hat und löschen sich selbst nach {os.getenv('GR_DEL_MIN')}.\n'
+                                 '**Weitervereitung der Dateien ist strengstens verboten.**\n'
+                                 '\n'
+                                 '## Warum veröffentlichen wir die Altklausuren nicht einfach?\n'
+                                 'Natürlich könnten wir die Altklausuren auf GoogleDrive oder Moodle per Download zur Verfügung stellen.\n'
+                                 'Die Altklausuren sind jedoch Urheberrechtlich geschützt und sind Werke der jeweiligen Professoren/Dozenten.\n'
+                                 '\n'
+                                 '## Was ist, wenn ich eine Altklausur haben will, die nicht auf der Liste steht?\n'
+                                 'Wenn ein Modul nicht auf der List steht, dann gibt es schlicht keine Altklausur dazu. Wir bemühen uns aber die Liste stetig zu erweitern.\n'
+                                 '\n'
+                                 '## Ihr habt Altklausuren, die noch nicht auf unserem Discord-Server zur Verfügung stehen?\n'
+                                 'Schreibt uns an `grauerraum-fsr16@uni-kassel.de` und wir schauen, ob und wie wir sie hier veröffentlichen können.\n'
+                                 '\n'
+                                 '## Ihr möchtet Altklausuren ausdrucken?\n'
+                                 f'Gegen einen geringen Beitrag könnt ihr das bei uns in der Fachschaft machen. Während der Vorlesungszeit könnt ihr {os.getenv('GR_ZEITEN')} '
+                                 f'vorbeikommen oder schreibt an `grauerraum-fsr16@uni-kassel.de`, um einen Termin zu vereinbaren. Eine Terminvereinbarung ist auch außerhalb der Vorlesungszeit möglich.')
+
+    await interaction.response.send_message('Anleitung gesendet')
 
 
 client.run(TOKEN)
