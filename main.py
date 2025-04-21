@@ -40,11 +40,13 @@ async def on_ready():
 ### message logging
 @client.event
 async def on_message_edit(before, after):
+    if before.author == client.user:
+        return
+
     log_channel = client.get_channel(int(os.getenv('LOG_CHANNEL_ID')))
     author = before.author
     channel = before.channel
     time_edit = after.edited_at.astimezone()
-    #TODO check if bot changed message in gr -> don't log
 
     msg_edit = discord.Embed()
     msg_edit.colour = discord.Colour.yellow()
@@ -59,11 +61,13 @@ async def on_message_edit(before, after):
 
 @client.event
 async def on_message_delete(message):
+    if message.author == client.user:
+        return
+
     log_channel = client.get_channel(int(os.getenv('LOG_CHANNEL_ID')))
     author = message.author
     channel = message.channel
     time_del = datetime.datetime.now().astimezone()
-    #TODO check if bot deleted message in gr -> don't log
 
     msg_del = discord.Embed()
     msg_del.colour = discord.Colour.red()
