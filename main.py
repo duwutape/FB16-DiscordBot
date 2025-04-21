@@ -154,4 +154,18 @@ async def anleitung(interaction):
     await interaction.response.send_message('Anleitung gesendet')
 
 
+@tree.command(name='module', description='Sendet alle verfügbaren Module in den Anleitungschannel')
+async def module(interaction):
+    inf = utils.create_available_modules('inf')
+    etech = utils.create_available_modules('etech')
+    sonst = utils.create_available_modules('sonst')
+
+    anleitung_channel = client.get_channel(int(os.getenv('GR_ANLEITUNG_CHANNEL_ID')))
+    await anleitung_channel.send(embed=inf)
+    await anleitung_channel.send(embed=etech)
+    await anleitung_channel.send(embed=sonst)
+
+    await interaction.response.send_message('Verfügbare Module gesendet')
+
+
 client.run(TOKEN)

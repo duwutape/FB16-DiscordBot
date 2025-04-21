@@ -52,3 +52,32 @@ def tuple_to_str(tuple):
 def get_mod_ids():
     mod_str = os.getenv('MOD_IDS')
     return mod_str.split(',')
+
+
+def create_available_modules(study):
+    if study == 'inf':
+        study_long = 'Informatik'
+    elif study == 'etech':
+        study_long = 'Elekrotechnik'
+    else:
+        study_long = 'Sonstiges'
+
+    cursor = connect_db()
+    modules = cursor.execute(
+        f"SELECT modul, beschreibung FROM altklausuren WHERE studiengang = '{study}' ORDER BY modul").fetchall()
+
+    embed = discord.Embed()
+    embed.title = f'Altklausuren {study_long}'
+    embed.add_field(name='Kürzel', value=create_embed_value(modules,0))
+    embed.add_field(name='Modul', value=create_embed_value(modules,1))
+
+    return embed
+
+
+def create_embed_value(moduels, index: int):
+    modules_formatted = ['%s' % modul[index] for modul in moduels]
+    out = ''
+    for modul in modules_formatted:
+        out = out + f'{modul}\n'
+
+    return out
