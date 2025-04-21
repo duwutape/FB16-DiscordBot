@@ -19,6 +19,9 @@ def connect_db():
     return cursor
 
 
+def close_db(cursor):
+    cursor.connection.close()
+
 def get_modules(cursor):
     modules_tuples = cursor.execute('SELECT modul FROM altklausuren ORDER BY modul;').fetchall()
     return tuple_list_to_list(modules_tuples)
