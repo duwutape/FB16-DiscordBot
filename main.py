@@ -1,6 +1,3 @@
-import sqlite3
-import time
-
 import discord
 from discord import app_commands
 from dotenv import load_dotenv
@@ -12,9 +9,6 @@ import utils
 
 ### CONFIG
 load_dotenv()
-TOKEN = os.getenv('TOKEN')
-LOG_CHANNEL_ID = int(os.getenv('LOG_CHANNEL_ID'))
-
 
 # client
 intents = discord.Intents.all()
@@ -99,7 +93,7 @@ async def gr(interaction, modul: str):
             no_file_log.colour = discord.Colour.red()
             no_file_log.title = f'Keine Altklausuren zu dem Modul {utils.get_modul_name(cursor, modul.lower())} gefunden'
             no_file_log.description = f'Unter dem Pfad `{path}` wurde keine Datei gefunden.'
-            await client.get_channel(LOG_CHANNEL_ID).send(embed=no_file_log)
+            await client.get_channel(int(os.getenv('LOG_CHANNEL_ID'))).send(embed=no_file_log)
 
             MOD_IDS = utils.get_mod_ids()
             if MOD_IDS is not None:
@@ -163,4 +157,12 @@ async def module(interaction):
     await interaction.response.send_message('Verfügbare Module gesendet')
 
 
-client.run(TOKEN)
+### LaTeX
+@tree.command(name='latex', description='Gibt den angegeben Ausdruck als LaTeX-Ausdruck wieder')
+#@app_commands.describe(ausdruck='Ausdruck, der in LaTeX angezeige werden soll')
+async def latex(interaction, ausdruck:str):
+    print('ausdruck')
+    interaction.response.send_message('platzhalter')
+
+
+client.run(os.getenv('TOKEN'))
