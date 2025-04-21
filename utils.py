@@ -45,3 +45,7 @@ def tuple_list_to_list(tuple_list):
 
 def tuple_to_str(tuple):
     return ''.join(tuple)
+
+def get_mod_ids():
+    mod_str = os.getenv('MOD_IDS')
+    return mod_str.split(',')
