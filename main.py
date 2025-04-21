@@ -6,6 +6,8 @@ from discord import app_commands
 from dotenv import load_dotenv
 import os
 import datetime
+
+import constants
 import utils
 
 ### CONFIG
@@ -13,8 +15,6 @@ load_dotenv()
 TOKEN = os.getenv('TOKEN')
 LOG_CHANNEL_ID = int(os.getenv('LOG_CHANNEL_ID'))
 
-# grauer raum
-GR_DEL_SEC = int(os.getenv('GR_DEL_MIN')) * 60
 
 # client
 intents = discord.Intents.all()
@@ -88,13 +88,13 @@ async def gr(interaction, modul: str):
             sent.title = f'Altklausren {utils.get_modul_name(cursor, modul.lower())}'
             sent.description = f'Bitte beachte, dass die Nachricht in {os.getenv('GR_DEL_MIN')} Minuten gelöscht wird'
             await interaction.response.send_message(embed=sent, file=discord.File(fp=path), ephemeral=True,
-                                                    delete_after=GR_DEL_SEC)
+                                                    delete_after=constants.GR_DEL_SEC)
         except FileNotFoundError as e:
             no_file = discord.Embed()
             no_file.colour = discord.Colour.red()
             no_file.title = 'Keine Altklausuren zu dem Modul gefunden'
             no_file.description = f'Das ist nicht dein Fehler. Das Team wurde bereits benachrichtigt.'
-            await interaction.response.send_message(embed=no_file, ephemeral=True, delete_after=GR_DEL_SEC)
+            await interaction.response.send_message(embed=no_file, ephemeral=True, delete_after=constants.GR_DEL_SEC)
             no_file_log = discord.Embed()
             no_file_log.colour = discord.Colour.red()
             no_file_log.title = f'Keine Altklausuren zu dem Modul {utils.get_modul_name(cursor, modul.lower())} gefunden'
@@ -114,7 +114,7 @@ async def gr(interaction, modul: str):
         no_modul.description = (f'Es wurde keine Altklausur für das angegebene Modul geunden.\n'
                                 f'Eine Liste aller verfügbaren Module findest du in <#{os.getenv('GR_ANLEITUNG_CHANNEL_ID')}>.\n'
                                 f'Bitte überprüfe auch, ob du den Modulnamen richtig gescrieben hast.')
-        await interaction.response.send_message(embed=no_modul, ephemeral=True, delete_after=GR_DEL_SEC)
+        await interaction.response.send_message(embed=no_modul, ephemeral=True, delete_after=constants.GR_DEL_SEC)
 
     utils.close_db(cursor)
 
