@@ -10,7 +10,7 @@ def connect_db():
     db = sqlite3.connect(os.getenv('DB_PATH'))
     cursor = db.cursor()
     cursor.execute('CREATE TABLE IF NOT EXISTS altklausuren('
-                   'modul TEXT PRIMARY KEY,'
+                   'modul TEXT,'
                    'modul_lower TEXT,'
                    'studiengang TEXT,'
                    'beschreibung TEXT'
