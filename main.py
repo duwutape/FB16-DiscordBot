@@ -87,30 +87,30 @@ async def gr(interaction, modul: str):
 
     if modul.lower() in modules_lower:
         path = utils.get_path(cursor, modul.lower())
-    try:
-        sent = discord.Embed()
-        sent.colour = discord.Colour.green()
-        sent.title = f'Altklausren {utils.get_modul_name(cursor, modul.lower())}'
-        sent.description = f'Bitte beachte, dass die Nachricht in {GR_DEL_MIN} Minuten gelöscht wird'
-        await interaction.response.send_message(embed=sent, file=discord.File(fp=path), ephemeral=True,
-                                                delete_after=GR_DEL_SEC)
-    except FileNotFoundError as e:
-        no_file = discord.Embed()
-        no_file.colour = discord.Colour.red()
-        no_file.title = 'Keine Altklausuren zu dem Modul gefunden'
-        no_file.description = f'Das ist nicht dein Fehler. Das Team wurde bereits benachrichtigt.'
-        await interaction.response.send_message(embed=no_file, ephemeral=True, delete_after=GR_DEL_SEC)
-        no_file_log = discord.Embed()
-        no_file_log.colour = discord.Colour.red()
-        no_file_log.title = f'Keine Altklausuren zu dem Modul {modul} gefunden'
-        no_file_log.description = f'Unter dem Pfad `{path}` wurde keine Datei gefunden.'
-        await client.get_channel(LOG_CHANNEL_ID).send(embed=no_file_log)
+        try:
+           sent = discord.Embed()
+           sent.colour = discord.Colour.green()
+           sent.title = f'Altklausren {utils.get_modul_name(cursor, modul.lower())}'
+           sent.description = f'Bitte beachte, dass die Nachricht in {GR_DEL_MIN} Minuten gelöscht wird'
+           await interaction.response.send_message(embed=sent, file=discord.File(fp=path), ephemeral=True,
+                                                    delete_after=GR_DEL_SEC)
+        except FileNotFoundError as e:
+            no_file = discord.Embed()
+            no_file.colour = discord.Colour.red()
+            no_file.title = 'Keine Altklausuren zu dem Modul gefunden'
+            no_file.description = f'Das ist nicht dein Fehler. Das Team wurde bereits benachrichtigt.'
+            await interaction.response.send_message(embed=no_file, ephemeral=True, delete_after=GR_DEL_SEC)
+            no_file_log = discord.Embed()
+            no_file_log.colour = discord.Colour.red()
+            no_file_log.title = f'Keine Altklausuren zu dem Modul {utils.get_modul_name(cursor, modul.lower())} gefunden'
+            no_file_log.description = f'Unter dem Pfad `{path}` wurde keine Datei gefunden.'
+            await client.get_channel(LOG_CHANNEL_ID).send(embed=no_file_log)
 
-        MOD_IDS = os.getenv('MOD_IDS')
-        for mod_id in MOD_IDS:
-            mod = client.get_user(int(mod_id))
-            await mod.create_dm()
-            await mod.dm_channel.send(embed=no_file_log)
+            MOD_IDS = utils.get_mod_ids()
+            for mod_id in MOD_IDS:
+                mod = client.get_user(int(mod_id))
+                await mod.create_dm()
+                await mod.dm_channel.send(embed=no_file_log)
     else:
         no_modul = discord.Embed()
         no_modul.colour = discord.Colour.red()
