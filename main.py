@@ -21,9 +21,10 @@ intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
+
 ### INIT DB
-data = sqlite3.connect('data.db')
-cursor = data.cursor()
+# data = sqlite3.connect('data.db')
+# cursor = data.cursor()
 
 
 ### BOT EVENTS
